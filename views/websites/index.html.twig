@@ -1,0 +1,48 @@
+{% include 'default/header.html.twig' %}
+<div class="container">
+    <a href="websites/add" class="btn btn-info btn-sm m-2">Adicionar</a>
+    <table class="table m-2">
+        <thead>
+            <th>UA</th>
+            <th>Nome</th>
+            <th></th>
+        </thead>
+        <tbody>
+        {% for row in data %}
+            <tr id="tracking-id-{{ row.tracking_id }}">
+                <td >{{ row.tracking_id }}</td>
+                <td>{{ row.name }}</td>
+                <td>
+                    <a href="/websites/edit/{{ row.tracking_id }}" class="btn btn-info btn-sm">Editar</a>
+                    <span
+                            {{ row.tracking_id }}
+                            onclick="deleteItem('{{ row.tracking_id }}')"
+                            type="button"
+                            class="btn btn-sm btn-danger">
+                        Remover
+                    </span>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'default/footer.html.twig' %}
+
+<script>
+    function deleteItem(tracking_id){
+        if(confirm('Vocẽ deseja remover esse item?')) {
+            let data = {
+                delete:  true,
+                tracking_id:tracking_id
+            }
+            $.post(`/websites/delete`,data,
+                function(data){
+                    if(data.status){
+                        $(`#tracking-id-${tracking_id}`).remove()
+                    }
+                }
+            );
+        }
+    }
+</script>

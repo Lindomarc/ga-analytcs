@@ -1,0 +1,25 @@
+{
+    "name": "rayz90/ga_dashboard",
+    "description": "A Google Analytics dashboard with support for multiple GA properties",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Raymond Vermaas",
+            "email": "github@raymondvermaas.nl"
+        }
+    ],
+    "require": {
+        "silex/silex": "v1.3.6",
+        "google/apiclient": "1.1.9",
+        "monolog/monolog": "~1.0",
+        "twig/twig": "2.*",
+        "firebase/php-jwt": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Controllers\\": "controllers",
+            "Model\\": "model"
+        }
+    }
+}

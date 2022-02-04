@@ -1,0 +1,58 @@
+{% include 'default/header.html.twig' %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+</figure>
+<script>
+    Highcharts.chart('container', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Visitantes Online'
+        },
+        subtitle: {
+            text: 'MSWI Soluções Web Inteligentes'
+        },
+        xAxis: {
+            categories: {{ categories | join('","') | raw }},
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Usuários',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' '
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: false,
+        credits: {
+            enabled: false
+        },
+        series: [{
+            name: 'Agóra',
+            data: {{ series | join('","') | raw }}
+        }]
+    });
+</script>
+
+{% include 'default/footer.html.twig' %}
