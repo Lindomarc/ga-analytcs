@@ -1,12 +1,11 @@
 <?php
-date_default_timezone_set('America/Sao_Paulo');
-
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../core/JWTWrapper.php';
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Silex\Application;use Controllers\Users;
+use Silex\Application;
+use Controllers\Users;
 
 $app = new Silex\Application();
 // Autenticacao
