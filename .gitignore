@@ -3,3 +3,4 @@ log/
 config/
 docroot/error_log
 vendor/
+docroot/websites.db
