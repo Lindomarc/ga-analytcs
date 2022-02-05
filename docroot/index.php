@@ -248,28 +248,7 @@ $app->get('/visitantes-online', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
     }
-//    /* @var Google_Service_Analytics $service */
-//    $service = $app['google_api_service'];
-//    $websites = $app['websites'];
-//    $items = array();
-//
-//    foreach ($websites as $name => $code) {
-//        try {
-//            $visitors = $service->data_realtime->get($code, 'rt:activeUsers');
-//            $items[$name] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
-//        } catch (Google_Exception $e) {
-//            $app['monolog']->addError($e->getMessage());
-//        }
-//    }
-//
-//    $categories = [];
-//    foreach ($items as $caregory => $serie) {
-//        $categories[] = $caregory;
-//        $series[] = (int)$serie;
-//    }
-
-
-    return $app['twig']->render('default/highcharts.html.twig');
+    return $app['twig']->render('default/visitors-online.html.twig');
 });
 $app->get('/api/visitors-online.json', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
@@ -300,8 +279,6 @@ $app->get('/api/visitors-online.json', function (Silex\Application $app) {
         'series' => $series
     ];
 
-//    $headers = array('Content-Type' => 'application/json');
-//    $response = new Response($content, 200, $headers);
     return $app->json($content);
 
 });
