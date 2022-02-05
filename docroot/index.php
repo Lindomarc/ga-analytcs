@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set("America/Belem");
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../core/JWTWrapper.php';
 
@@ -111,7 +112,8 @@ $app['websites'] = $app->share(function ($app) {
         foreach ($web_properties->getItems() as $property) {
             foreach ($tracking_codes as $code) {
                 if ($property->id === $code['tracking_id']) {
-                    $websites[$code['name']] = 'ga:' . $property->defaultProfileId;
+                    $websites[$code['tracking_id']]['ga'] = 'ga:' . $property->defaultProfileId;
+                    $websites[$code['tracking_id']]['name'] = $code['name'];
                 }
             }
         }
@@ -158,18 +160,15 @@ $app->get('/api/getuserslastday.csv', function (Silex\Application $app) {
     $service = $app['google_api_service'];
     $websites = $app['websites'];
     $data = array();
-
     $params = array(
         'dimensions' => 'ga:dateHour',
         'sort' => '-ga:dateHour',
         'max-results' => '25',
     );
-
-    foreach ($websites as $name => $code) {
+    foreach ($websites as $code => $website) {
         $visitors = null;
-
         try {
-            $visitors = $service->data_ga->get($code, 'yesterday', 'today', 'ga:users', $params);
+            $visitors = $service->data_ga->get($website['ga'], 'yesterday', 'today', 'ga:users', $params);
             $results = array();
             if ($visitors->getRows())
                 foreach ($visitors->getRows() as $row) {
@@ -185,7 +184,7 @@ $app->get('/api/getuserslastday.csv', function (Silex\Application $app) {
                 $formated_date = $current_datetime->format('YmdH');
                 $users = (array_key_exists($formated_date, $results)) ? $results[$formated_date] : 0;
                 $data[] = array(
-                    'website' => $name,
+                    'website' => $website['name'],
                     'dateHour' => $formated_date,
                     'users' => $users,
                 );
@@ -206,6 +205,71 @@ $app->get('/api/getuserslastday.csv', function (Silex\Application $app) {
     return $response;
 });
 
+$app->get('/api/get-active-users-hrs.json', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
+    /* @var Google_Service_Analytics $service */
+    $service = $app['google_api_service'];
+    $websites = $app['websites'];
+    $data = array();
+
+    $params = array(
+        'dimensions' => 'ga:dateHour',
+        'sort' => '-ga:dateHour',
+        'max-results' => '24',
+    );
+
+    foreach ($websites as $code => $website) {
+        $visitors = null;
+        try {
+            $visitors = $service->data_ga->get(
+                $website['ga'],
+                'yesterday',
+                'today',
+                'ga:users',
+                $params
+            );
+            $results = [];
+            if ($visitors->getRows())
+                foreach ($visitors->getRows() as $row) {
+                    if (count($row) !== 2) {
+                        continue;
+                    }
+                    $results[$row[0]] = $row[1];
+                }
+            // Backfill the data
+            $current_datetime = new \DateTime('23 hours ago');
+//            var_dump($current_datetime);exit();
+            $end_date = new \DateTime('now');
+            $hrs = $series = [];
+
+            while ($current_datetime < $end_date) {
+                $formated_date = $current_datetime->format('YmdH');
+
+                $hrs[] = $current_datetime->format('H');
+
+                $users = (array_key_exists($formated_date, $results)) ? $results[$formated_date] : 0;
+                $series[]= (int)$users;
+                $current_datetime->add(new DateInterval('PT1H'));
+            }
+            $hrs[] = '...';
+            $usersNow = $service->data_realtime->get($website['ga'], 'rt:activeUsers');
+            $usersNow = (int)($usersNow->getTotalResults() > 0) ? $usersNow->getRows()[0][0] : 0;
+            $data[]= [
+                'UA' => $code,
+                'name' => $website['name'],
+                'series' => $series,
+                'visitors' => $usersNow,
+                'hrs' => $hrs
+            ];
+        } catch (Google_Exception $e) {
+            $app['monolog']->addError($e->getMessage());
+        }
+    }
+    return $app->json($data);
+});
+
 $app->get('/api/getactiveusers.json', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
@@ -215,24 +279,46 @@ $app->get('/api/getactiveusers.json', function (Silex\Application $app) {
     $websites = $app['websites'];
     $data = array();
 
-    foreach ($websites as $name => $code) {
+    foreach ($websites as $code => $website) {
         try {
-            $visitors = $service->data_realtime->get($code, 'rt:activeUsers');
-            $data[$name] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
+            $visitors = $service->data_realtime->get($website['ga'], 'rt:activeUsers');
+            $data[$website['name']] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
         } catch (Google_Exception $e) {
             $app['monolog']->addError($e->getMessage());
         }
     }
 
-    $content = $app['twig']->render('api/getactiveusers.json.twig', array(
-        'data' => $data,
-    ));
-
-    $headers = array('Content-Type' => 'application/json');
-    $response = new Response($content, 200, $headers);
-    return $response;
+    return $app->json($data);
 });
 
+$app->get('/api/get-active-users-online.json', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
+    /* @var Google_Service_Analytics $service */
+    $service = $app['google_api_service'];
+    $websites = $app['websites'];
+    $data = array();
+
+    foreach ($websites as $code => $website) {
+        try {
+            $visitors = $service->data_realtime->get($website['ga'], 'rt:activeUsers');
+            $data[$website['name']] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
+        } catch (Google_Exception $e) {
+            $app['monolog']->addError($e->getMessage());
+        }
+    }
+
+    return $app->json($data);
+});
+
+$app->get('/', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
+    return $app['twig']->render('default/active-users-hrs.html.twig');
+});
+/*
 $app->get('/', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
@@ -243,7 +329,7 @@ $app->get('/', function (Silex\Application $app) {
         'vertical_tiles' => $config->vertical_tiles,
     ));
 });
-
+*/
 $app->get('/visitantes-online', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
@@ -258,11 +344,10 @@ $app->get('/api/visitors-online.json', function (Silex\Application $app) {
     $service = $app['google_api_service'];
     $websites = $app['websites'];
     $items = array();
-
-    foreach ($websites as $name => $code) {
+    foreach ($websites as $name => $website) {
         try {
-            $visitors = $service->data_realtime->get($code, 'rt:activeUsers');
-            $items[$name] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
+            $visitors = $service->data_realtime->get($website['ga'], 'rt:activeUsers');
+            $items[$website['name']] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
         } catch (Google_Exception $e) {
             $app['monolog']->addError($e->getMessage());
         }

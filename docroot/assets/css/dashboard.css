@@ -149,3 +149,5 @@ div.loading > div {
         transform: scale(1.4);
     }
 }
+
+.highcharts-credits{display: none}
