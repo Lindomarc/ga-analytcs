@@ -11,8 +11,8 @@ class User extends DB
     public function login($username, $password)
     {
         $data = $this->select("SELECT *  FROM `users` WHERE `username`='$username'");
-  var_dump($data);exit;
         if (password_verify($password, $data['password'])) {
+            session_start();
             $_SESSION[User::SESSION] = $data;
             return $data;
         }

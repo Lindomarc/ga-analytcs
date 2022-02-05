@@ -1,39 +1,13 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../core/JWTWrapper.php';
+
+use Controllers\Users;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Silex\Application;
-use Controllers\Users;
 
 $app = new Silex\Application();
-// Autenticacao
-$app->post('/auth', function (Request $request) use ($app) {
-    $dados = json_decode($request->getContent(), true);
 
-    if($dados['user'] == 'foo' && $dados['pass'] == 'bar') {
-        // autenticacao valida, gerar token
-        $jwt = JWTWrapper::encode([
-            'expiration_sec' => 3600,
-            'iss' => 'douglaspasqua.com',
-            'userdata' => [
-                'id' => 1,
-                'name' => 'Douglas Pasqua'
-            ]
-        ]);
-
-        return $app->json([
-            'login' => 'true',
-            'access_token' => $jwt
-        ]);
-    }
-
-    return $app->json([
-        'login' => 'false',
-        'message' => 'Login Inválido',
-    ]);
-});
 /* START CONFIGURATION */
 $app['debug'] = true;
 $app['config_path'] = __DIR__ . '/../config/config.json';
@@ -41,6 +15,7 @@ $app['config_path'] = __DIR__ . '/../config/config.json';
 $app['session.storage.options'] = [
     'cookie_lifetime' => 3600
 ];
+
 /*
  * Register Providers
  */
@@ -54,22 +29,22 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 
 $app->register(new Silex\Provider\SessionServiceProvider());
 
-$app->get('/login', function (Silex\Application $app) {
+$app['session']->all();
 
+$app->get('/login', function (Silex\Application $app) {
     return $app['twig']->render('users/login.html.twig');
 });
 
 $app->post('/login', function (Silex\Application $app) {
 
-    if((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password']) && $_POST['password'])){
+    if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password']) && $_POST['password'])) {
         $username = trim($_POST['username']);
         $password = $_POST['password'];
-        $user =  new Users();
-        $login = $user->login($username,$password);
+        $user = new Users();
+        $login = $user->login($username, $password);
 
-        if( $login ){
-            $_SESSION['flash'] = ['message' => "Usuário ou senha é inválido", 'status' => 'error'];
-            header('location:login.php');
+        if ($login) {
+            return $app->redirect('/');
         }
     }
 
@@ -77,8 +52,14 @@ $app->post('/login', function (Silex\Application $app) {
 });
 
 $app->get('/logout', function (Silex\Application $app) {
-    header('Location:/login');
+    $app['session']->all();
+    unset($_SESSION['Auth']);
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
 });
+
+
 
 $app['config'] = $app->share(function ($app) {
     $config = array();
@@ -162,12 +143,18 @@ function websites()
 }
 
 $app->get('/api/websites', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     $content = json_encode(websites());
     $headers = array('Content-Type' => 'application/json');
     return new Response($content, 200, $headers);
 });
 
 $app->get('/api/getuserslastday.csv', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     /* @var Google_Service_Analytics $service */
     $service = $app['google_api_service'];
     $websites = $app['websites'];
@@ -221,6 +208,9 @@ $app->get('/api/getuserslastday.csv', function (Silex\Application $app) {
 });
 
 $app->get('/api/getactiveusers.json', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     /* @var Google_Service_Analytics $service */
     $service = $app['google_api_service'];
     $websites = $app['websites'];
@@ -245,7 +235,9 @@ $app->get('/api/getactiveusers.json', function (Silex\Application $app) {
 });
 
 $app->get('/', function (Silex\Application $app) {
-
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     $config = $app['config']->display;
     return $app['twig']->render('default/index.html.twig', array(
         'horizontal_tiles' => $config->horizontal_tiles,
@@ -254,11 +246,13 @@ $app->get('/', function (Silex\Application $app) {
 });
 
 $app->get('/visitantes-online', function (Silex\Application $app) {
-
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     /* @var Google_Service_Analytics $service */
     $service = $app['google_api_service'];
     $websites = $app['websites'];
-    $items= array();
+    $items = array();
 
     foreach ($websites as $name => $code) {
         try {
@@ -269,8 +263,8 @@ $app->get('/visitantes-online', function (Silex\Application $app) {
         }
     }
 
-    $categories= [];
-    foreach ($items as $caregory => $serie ){
+    $categories = [];
+    foreach ($items as $caregory => $serie) {
         $categories[] = $caregory;
         $series[] = (int)$serie;
     }
@@ -283,12 +277,18 @@ $app->get('/visitantes-online', function (Silex\Application $app) {
 });
 
 $app->get('/websites', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     return $app['twig']->render('websites/index.html.twig', array(
         'data' => websites()
     ));
 });
 
 $app->get('/websites/add', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     $config = $app['config']->display;
     return $app['twig']->render('websites/add.html.twig', array(
         'horizontal_tiles' => $config->horizontal_tiles,
@@ -297,6 +297,9 @@ $app->get('/websites/add', function (Silex\Application $app) {
 });
 
 $app->post('/websites/add', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     if (isset($_POST['tracking_id']) && !!$_POST['tracking_id']) {
         require_once __DIR__ . '/../config/dbconfig.php';
         $sql = 'SELECT count(*) 
@@ -315,6 +318,9 @@ $app->post('/websites/add', function (Silex\Application $app) {
 });
 
 $app->get('/websites/edit/{item}', function (Silex\Application $app, $item) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
 
     if ($item) {
         require_once __DIR__ . '/../config/dbconfig.php';
@@ -333,9 +339,12 @@ $app->get('/websites/edit/{item}', function (Silex\Application $app, $item) {
 });
 
 $app->post('/websites/edit/{item}', function (Silex\Application $app, $item) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     if ($item) {
         require_once __DIR__ . '/../config/dbconfig.php';
-        $sql = 'UPDATE websites SET  name = "'.$_POST['name'].'" where tracking_id = "' . $item . '"';
+        $sql = 'UPDATE websites SET  name = "' . $_POST['name'] . '" where tracking_id = "' . $item . '"';
         $db->exec($sql);
 
         $sql = 'SELECT * FROM  websites where tracking_id = "' . trim($item) . '"';
@@ -353,6 +362,9 @@ $app->post('/websites/edit/{item}', function (Silex\Application $app, $item) {
 });
 
 $app->post('/websites/delete', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     if (isset($_POST['tracking_id']) && !!$_POST['tracking_id']) {
         require_once __DIR__ . '/../config/dbconfig.php';
 
