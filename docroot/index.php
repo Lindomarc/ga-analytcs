@@ -60,7 +60,6 @@ $app->get('/logout', function (Silex\Application $app) {
 });
 
 
-
 $app['config'] = $app->share(function ($app) {
     $config = array();
     try {
@@ -249,6 +248,33 @@ $app->get('/visitantes-online', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
     }
+//    /* @var Google_Service_Analytics $service */
+//    $service = $app['google_api_service'];
+//    $websites = $app['websites'];
+//    $items = array();
+//
+//    foreach ($websites as $name => $code) {
+//        try {
+//            $visitors = $service->data_realtime->get($code, 'rt:activeUsers');
+//            $items[$name] = ($visitors->getTotalResults() > 0) ? $visitors->getRows()[0][0] : 0;
+//        } catch (Google_Exception $e) {
+//            $app['monolog']->addError($e->getMessage());
+//        }
+//    }
+//
+//    $categories = [];
+//    foreach ($items as $caregory => $serie) {
+//        $categories[] = $caregory;
+//        $series[] = (int)$serie;
+//    }
+
+
+    return $app['twig']->render('default/highcharts.html.twig');
+});
+$app->get('/api/visitors-online.json', function (Silex\Application $app) {
+    if (!isset($_SESSION['Auth'])) {
+        return $app->redirect('/login');
+    }
     /* @var Google_Service_Analytics $service */
     $service = $app['google_api_service'];
     $websites = $app['websites'];
@@ -263,17 +289,21 @@ $app->get('/visitantes-online', function (Silex\Application $app) {
         }
     }
 
-    $categories = [];
-    foreach ($items as $caregory => $serie) {
-        $categories[] = $caregory;
-        $series[] = (int)$serie;
+    $categories = $series = [];
+    foreach ($items as $category => $serie) {
+        $categories[] = $category;
+        $series[] = (int) $serie;
     }
 
+    $content = [
+        'categories' => $categories,
+        'series' => $series
+    ];
 
-    return $app['twig']->render('default/highcharts.html.twig', array(
-        'categories' => json_encode($categories),
-        'series' => json_encode($series)
-    ));
+//    $headers = array('Content-Type' => 'application/json');
+//    $response = new Response($content, 200, $headers);
+    return $app->json($content);
+
 });
 
 $app->get('/websites', function (Silex\Application $app) {

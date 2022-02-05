@@ -2,22 +2,7 @@
 <script type="text/javascript" src="/assets/js/highcharts.js"></script>
 <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
-    let getJSON = function (url) {
-        return new Promise(function (resolve, reject) {
-            let xhr = new XMLHttpRequest();
-            xhr.open('get', url, true);
-            xhr.responseType = 'json';
-            xhr.onload = function () {
-                let status = xhr.status;
-                if (status == 200) {
-                    resolve(xhr.response);
-                } else {
-                    reject(status);
-                }
-            };
-            xhr.send();
-        });
-    };
+
 
     let realtime = {};
 
@@ -92,7 +77,7 @@
             ]);
 
             // Add an SVG element for each website, with the desired dimensions and margin.
-
+            $("#graphcs svg").fadeOut("slow").remove();
             let svg = d3.select("#graphcs").selectAll("svg")
                 .data(websites)
                 .enter().append("svg")
@@ -142,6 +127,7 @@
                 .text(function (d) {
                     return (d.key in realtime) ? realtime[d.key] : 0;
                 });
+            $(".loading").fadeOut("slow");
         });
     }
 
@@ -155,18 +141,18 @@
     getuserslastday()
     setInterval(()=>{
         getactiveusers();
-        getuserslastday()
+        getuserslastday();
     },300000)
+
 </script>
 <style>
     svg.graph-bg {
         margin: 4px;
     }
+
 </style>
 
 <div id="graphcs">
-    <div class="card"></div>
 </div>
-
 
 {% include 'default/footer.html.twig' %}
