@@ -3,4 +3,4 @@ log/
 config/
 docroot/error_log
 vendor/
-docroot/websites.db
+model/sqlite/database.db
