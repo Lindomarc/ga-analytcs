@@ -1,49 +1,65 @@
 {% include 'default/header.html.twig' %}
-<div class="container">
-    <a href="websites/add" class="btn btn-info btn-sm m-2">Adicionar</a>
-    <table class="table m-2">
-        <thead>
-            <th>UA</th>
-            <th>Nome</th>
-            <th></th>
-        </thead>
-        <tbody>
-        {% for row in data %}
-            <tr id="tracking-id-{{ row.tracking_id }}">
-                <td >{{ row.tracking_id }}</td>
-                <td>{{ row.name }}</td>
-                <td>
-                    <a href="/websites/edit/{{ row.tracking_id }}" class="btn btn-info btn-sm">Editar</a>
-                    <span
-                            {{ row.tracking_id }}
-                            onclick="deleteItem('{{ row.tracking_id }}')"
-                            type="button"
-                            class="btn btn-sm btn-danger">
-                        Remover
-                    </span>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="container mb-5">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Lista de Sites</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="/websites/add"  class="btn btn-sm btn-outline-primary">Adicionar</a>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header"></div>
+            <table class="table table-striped table-sm ">
+                <thead>
+                <th>Nome</th>
+                <th>GA:</th>
+                {% if isAdmin == 1 %}
+                <th></th>
+                {% endif %}
+                </thead>
+                <tbody>
+                {% for row in data %}
+                    <tr id="item-id-{{ row.id }}">
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.tracking_id }}</td>
+                        {% if isAdmin == 1 %}
+                        <td class="justify-content-between">
+                            <a href="/websites/permission/{{ row.id }}" class="btn btn-default btn-sm">Permissão</a>
+                            <a href="/websites/edit/{{ row.id }}" class="btn btn-primary btn-sm">Editar</a>
+                            <span
+                                {{ row.id }}
+                                    onclick="deleteItem('{{ row.id }}')"
+                                    type="button"
+                                    class="btn btn-sm btn-danger">
+                                Remover
+                            </span>
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+    </div>
 </div>
 {% include 'default/footer.html.twig' %}
 
 <script>
-    function deleteItem(tracking_id){
-        if(confirm('Vocẽ deseja remover esse item?')) {
+    function deleteItem(id) {
+        if (confirm('Vocẽ deseja remover esse item?')) {
             let data = {
-                delete:  true,
-                tracking_id:tracking_id
+                delete: true,
+                id: id
             }
-            $.post(`/websites/delete`,data,
-                function(data){
-                    if(data.status){
-                        $(`#tracking-id-${tracking_id}`).remove()
+            $.post(`/websites/delete`, data,
+                function (response) {
+                    if (response) {
+                        $(`#item-id-${id}`).remove()
                     }
                 }
             );
         }
     }
+
     $(".loading").hide();
 </script>

@@ -1,5 +1,9 @@
 {% include 'default/header.html.twig' %}
-<script type="text/javascript" src="/assets/js/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
 <style>
     svg.graph-bg {
         margin: 4px;
@@ -64,9 +68,9 @@
 
     function getactiveusers() {
         getJSON('/api/get-active-users-hrs.json').then(function (data) {
-
             data.forEach(function (value) {
-                $('#graphics').append(`<div class="col-sm-12 col-md-6 "><figure class="highcharts-figure"><div id="chart-${value.UA}"></div></figure></div>`)
+                $('#graphics')[0].innerHTML = '';
+                $('#graphics').append(`<div class="col-sm-12 col-md-6 card m-3"><figure class="highcharts-figure"><div id="chart-${value.UA}"></div></figure></div>`)
                 Highcharts.chart(`chart-${value.UA}`, {
                 chart: {
                     type: 'area'
@@ -110,16 +114,14 @@
                     data: value.series
                 }]
             });
-                $(".loading").hide();
+                $(".loading").fadeOut('slow');
             })
         });
     }
 
-    getactiveusers()
-    setInterval(()=>{
+
+    interval(function(){
         getactiveusers()
-    },60000)
-
-
+    }, 60000);
 </script>
 {% include 'default/footer.html.twig' %}

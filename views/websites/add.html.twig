@@ -1,21 +1,32 @@
 {% include 'default/header.html.twig' %}
 <div class="container">
-
-    <div>
-        <a href="/websites/add" class="btn btn-info btn-sm m-2">Adicionar</a>
-        <a href="/websites" class="btn btn-info btn-sm m-2">Lista</a>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Adicionar</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="/websites/add" class="btn btn-sm btn-outline-primary">Adicionar</a>
+                <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
+            </div>
+        </div>
     </div>
-    <form method="POST">
-        <div class="form-group">
-            <label for="tracking_id">UA</label>
-            <input type="text" name="tracking_id" class="form-control" placeholder="tracking_id" id="tracking_id" required>
-        </div>
-        <div class="form-group">
-            <label for="name">name:</label>
-            <input type="text" name="name" class="form-control" placeholder="name" id="name" required>
-        </div>
-        <button type="submit" class="btn btn-primary  btn-sm">Submit</button>
-    </form>
+    <div class="card">
+        <div class="card-header"></div>
+        <form method="POST" autocomplete="off" class="row m-3">
+            <div class="form-group col-md-6">
+                <label for="name">Nome do Site:</label>
+                <input type="text" name="name" class="form-control" placeholder="Nome do Site" id="name" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="tracking_id">Número GA:</label>
+                <input type="number" name="tracking_id" class="form-control" placeholder="Número GA:" id="tracking_id"
+                       required>
+            </div>
+            <div class="form-group col-md-12">
+                <input type="hidden" name="user_id" value="{{ data['user_id'] }}">
+                <button type="submit" class="btn btn-primary  btn-sm">Submit</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% include 'default/footer.html.twig' %}
 <script>$(".loading").hide();</script>
