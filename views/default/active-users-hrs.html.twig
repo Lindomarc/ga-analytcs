@@ -69,7 +69,6 @@
     function getactiveusers() {
         getJSON('/api/get-active-users-hrs.json').then(function (data) {
             data.forEach(function (value) {
-                $('#graphics')[0].innerHTML = '';
                 $('#graphics').append(`<div class="col-sm-12 col-md-6 card m-3"><figure class="highcharts-figure"><div id="chart-${value.UA}"></div></figure></div>`)
                 Highcharts.chart(`chart-${value.UA}`, {
                 chart: {
