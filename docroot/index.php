@@ -83,20 +83,11 @@ $app['config'] = $app->share(function ($app) {
     return $config;
 });
 
-$app['google_api_service'] = $app->share(function ($app) {
-    try {
-        $service = Analytics::initialize();
-    } catch (Google_Exception $e) {
-        $app['monolog']->addError($e->getMessage());
-        exit(1);
-    }
-    return $service;
-});
 
 $app['websites'] = $app->share(function ($app) {
     return  \Controllers\Websites::list();
 //    $config = $app['config'];
-//    $service = $app['google_api_service'];
+//    $service = Analytics::initialize();
 //    $websites = array();
 //    $tracking_codes = websites();
 //    try {
@@ -133,7 +124,7 @@ $app->get('/api/getuserslastday.csv', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
     }
-    $service = $app['google_api_service'];
+    $service = Analytics::initialize();
     $websites = $app['websites'];
     $data = array();
     $params = array(
@@ -185,8 +176,7 @@ $app->get('/api/get-active-users-hrs.json', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
     }
-    /* @var Google_Service_Analytics $service */
-    $service = $app['google_api_service'];
+    $service = Analytics::initialize();
     $websites = $app['websites'];
     $data = array();
     $params = array(
@@ -232,7 +222,7 @@ $app->get('/api/get-active-users-hrs.json', function (Silex\Application $app) {
                 $hrs[] = '...';
                 $data[] = [
                     'visitors' => (int)Analytics::visitors($service, $website['tracking_id']),
-                    'UA' => $code,
+                    'ga' => $website['tracking_id'],
                     'name' => $website['name'],
                     'series' => $series,
                     'hrs' => $hrs
@@ -251,7 +241,7 @@ $app->get('/api/getactiveusers.json', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
     }
-    $service = $app['google_api_service'];
+    $service = Analytics::initialize();
     $websites = $app['websites'];
     $data = array();
 
@@ -273,7 +263,7 @@ $app->get('/api/get-active-users-online.json', function (Silex\Application $app)
         return $app->redirect('/login');
     }
     /* @var Google_Service_Analytics $service */
-    $service = $app['google_api_service'];
+    $service = Analytics::initialize();
     $websites = $app['websites'];
     $data = $results = array();
     foreach ($websites as $website) {
@@ -310,7 +300,7 @@ $app->get('/api/visitors-online.json', function (Silex\Application $app) {
     if (!isset($_SESSION['Auth'])) {
         return $app->redirect('/login');
     }
-    $service = $app['google_api_service'];
+    $service = Analytics::initialize();
     $websites = $app['websites'];
     $items = $categories = $series = [];
     if ($websites) {
