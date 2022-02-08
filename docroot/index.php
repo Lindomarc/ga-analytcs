@@ -27,7 +27,7 @@ use Middleware\Authentication as MAuth;
 $application = new Silex\Application();
 
 /* START CONFIGURATION */
-$application['debug'] = true;
+$application['debug'] = false;
 
 $application['config_path'] = __DIR__ . '/../config/config.json';
 /* END CONFIGURATION */
@@ -425,9 +425,7 @@ $application->post('/websites/permission_delete', function (Silex\Application $a
 });
 
 $application->post('/websites/delete', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
-        return $application->redirect('/login');
-    }
+
 
     if (isset($_POST['id']) && !!$_POST['id']) {
         (new \Controllers\Websites())->delete();
@@ -437,7 +435,15 @@ $application->post('/websites/delete', function (Silex\Application $application)
 
 
 //$api = new Silex\Application();
+
+$application->get('/', function (Silex\Application $application) {
+    if (!isset($_SESSION['Auth'])) {
+        return $application->redirect('/login');
+    }
+    return $application->redirect('/dashboard');
+});
+
 $application->mount('/api/analytics', new Controllers\Api\ApiAnalytics());
-$application->mount('/', new Controllers\Dashboard());
+$application->mount('/dashboard', new Controllers\Dashboard());
 //$api->run();
 $application->run();

@@ -11,16 +11,13 @@ class Dashboard implements ControllerProviderInterface
 
     public function connect(Application $application)
     {
+
         $this->app = $application;
         $controllers = $this->app['controllers_factory'];
 
-        $controllers->get(
-            '/',
-            array($this, 'index')
-        );
 
         $controllers->get(
-            '/dashboard',
+            '/',
             array($this, 'index')
         );
 
