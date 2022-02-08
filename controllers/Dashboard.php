@@ -28,7 +28,7 @@ class Dashboard implements ControllerProviderInterface
     {
         return $this->app['twig']->render('default/active-users-hrs.html.twig', [
             'data' => Websites::list(),
-            'current' => '/'
+            'current' => '/dashboard'
         ]);
     }
 }

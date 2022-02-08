@@ -6,8 +6,7 @@ namespace Model;
 
 class User extends DB
 {
-
-    public string $table = 'users';
+    public $table = 'users';
 
     public function authenticate($apikey)
     {
@@ -22,16 +21,33 @@ class User extends DB
     {
         $data = @$this->select("SELECT *  FROM `users` WHERE `username`='$username'")[0];
         if (password_verify($password, $data['password'])) {
-
             $_SESSION['Auth'] = $data;
             return $data;
         }
         return $data;
     }
-    static public function list()
-    {
-        $User = new \Model\User();
-        $sql = 'SELECT id, name FROM  users WHERE admin = 0';
-        return $User->select($sql);
-    }
+
+
+//    static public function list($options)
+//    {
+//
+//        foreach ($options as $key => $option){
+//            if($key === 'conditions'){
+//                $conditions = ' where ' . $option['where'];
+//                if(!!$option['end']){
+//                    if (is_array($option['end'])){
+//                        $conditions .= ' end '. implode(' end ', $option['end']);
+//                    } else {
+//                        $conditions .= ' end '.$option['end'];
+//                    }
+//                }
+//
+//            }
+//            var_dump($conditions);
+//            exit();
+//        }
+//        $User = new \Model\User();
+//        $sql = 'SELECT id, name FROM  '.self::table .$conditions;
+//        return $User->select($sql);
+//    }
 }

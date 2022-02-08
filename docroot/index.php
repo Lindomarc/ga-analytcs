@@ -27,7 +27,7 @@ use Middleware\Authentication as MAuth;
 $application = new Silex\Application();
 
 /* START CONFIGURATION */
-$application['debug'] = false;
+$application['debug'] = true;
 
 $application['config_path'] = __DIR__ . '/../config/config.json';
 /* END CONFIGURATION */
@@ -445,5 +445,6 @@ $application->get('/', function (Silex\Application $application) {
 
 $application->mount('/api/analytics', new Controllers\Api\ApiAnalytics());
 $application->mount('/dashboard', new Controllers\Dashboard());
+$application->mount('/users', new Controllers\Users());
 //$api->run();
 $application->run();
