@@ -26,27 +26,32 @@ class Websites
         }
         $rows = (new Website())->select($sql);
         $data = [];
-        $count = 0;
+
         if ($rows)
             foreach ($rows as $key => $row) {
                 if (!!$row['id']) {
-                    $data[$count]['id'] = $row['id'];
+                    $data[$row['tracking_id']]['id'] = $row['id'];
                 }
                 if (!!$row['tracking_id']) {
-                    $data[$count]['tracking_id'] = $row['tracking_id'];
+                    $data[$row['tracking_id']]['tracking_id'] = $row['tracking_id'];
                 }
                 if (!!$row['name']) {
-                    $data[$count]['name'] = $row['name'];
+                    $data[$row['tracking_id']]['name'] = $row['name'];
                 }
                 if (!!$row['user_id']) {
-                    $data[$count]['user_id'] = $row['user_id'];
+                    $data[$row['tracking_id']]['user_id'] = $row['user_id'];
                 }
-                $count++;
+
             }
 
-        return $rows;
+        return $data;
     }
 
+    static public function websiteName($ga)
+    {
+        $website =self::list();
+        return $website[$ga]['name'];
+    }
     public function store()
     {
         $website = new Website();

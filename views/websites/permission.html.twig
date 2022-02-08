@@ -65,13 +65,16 @@
                 user_id: id,
                 website_id: {{ data['website']['id'] }}
             }
-            $.post(`/websites/permission_delete`, data,
-                function (response) {
+            $.ajax({
+                url: `/websites/permission_delete`,
+                data: data,
+                method: 'post',
+                success: function (response) {
                     if (response) {
                         $(`#user-website-id-${id}`).remove()
                     }
                 }
-            );
+            });
         }
     }
 

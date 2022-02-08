@@ -1,6 +1,16 @@
 .idea/
 log/
+cache/
 config/
 docroot/error_log
 vendor/
 model/sqlite/database.db
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###

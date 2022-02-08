@@ -14,12 +14,19 @@
         "google/apiclient": "1.1.9",
         "monolog/monolog": "~1.0",
         "twig/twig": "2.*",
-        "firebase/php-jwt": "^6.0"
+        "firebase/php-jwt": "^6.0",
+        "illuminate/database": "5.2"
     },
     "autoload": {
         "psr-4": {
             "Controllers\\": "controllers",
             "Model\\": "model"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true,
+            "kylekatarnls/update-helper": true
         }
     }
 }

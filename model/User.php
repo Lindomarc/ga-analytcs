@@ -2,16 +2,27 @@
 
 namespace Model;
 
+//use Illuminate\Database\Eloquent\Model;
+
 class User extends DB
 {
 
     public string $table = 'users';
 
+    public function authenticate($apikey)
+    {
+        $data = @$this->select("SELECT *  FROM `users` WHERE `apikey`='$apikey'")[0];
+        if (password_verify($apikey, $data['apikey'])) {
+            return $data;
+        }
+        return false;
+    }
+
     public function login($username, $password)
     {
         $data = @$this->select("SELECT *  FROM `users` WHERE `username`='$username'")[0];
         if (password_verify($password, $data['password'])) {
-            session_start();
+
             $_SESSION['Auth'] = $data;
             return $data;
         }

@@ -1,10 +1,27 @@
 <?php
 namespace Controllers;
-use Exception;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class App
+use Silex\Application,
+    Silex\ControllerProviderInterface,
+    Symfony\Component\HttpFoundation\Request,
+    Symfony\Component\HttpKernel\HttpKernelInterface;
+
+class Websites implements ControllerProviderInterface
 {
+    protected $app;
+
+    public function connect(Application $application)
+    {
+        $this->app   = $application;
+        $controllers = $this->app['controllers_factory'];
+
+        $controllers->get(
+            '/',
+            array($this, 'getAllBlogPosts')
+        );
+        return $controllers;
+    }
+
     public function render($request, Exception $e)
     {
         if ($e instanceof NotFoundHttpException) {

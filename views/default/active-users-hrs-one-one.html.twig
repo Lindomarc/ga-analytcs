@@ -1,0 +1,140 @@
+{% include 'default/header.html.twig' %}
+<div id="graphics" class="row">
+</div>
+{% include 'default/highcharts.html.twig' %}
+<script>
+    function getactiveusers(ga) {
+        // $.ajax(`/api/get-active-users-hrs.json/${ga}`, function (data) {
+            getJSON(`/api/get-active-users-hrs.json/${ga}`).then(function (data) {
+            if(!$(`#graphics div#${ga}`)[0]){
+                $('#graphics').append(`
+                <div id="${data.ga}" class="col-sm-12 col-md-4">
+                    <figure class="highcharts-figure card">
+                        <div id="chart-${data.ga}" ></div>
+                    </figure>
+                </div>`)
+            }
+            Highcharts.chart(`chart-${data.ga}`, {
+                chart: {
+                    type: 'area'
+                },
+                title: {
+                    text: `${data.name} - (<span class="visitors">${data.visitors}</span>)`
+                },
+                xAxis: {
+                    categories: data.hrs
+                },
+                yAxis: {
+                    title: {
+                        text: false
+                    },
+                    labels: {
+                        formatter: function () {
+                            return this.value;
+                        }
+                    }
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.y:,.0f}</b> {series.name} por hora'
+                },
+                plotOptions: {
+                    area: {
+                        pointStart: 1,
+                        marker: {
+                            enabled: false,
+                            symbol: 'circle',
+                            radius: 2,
+                            states: {
+                                hover: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Visitantes',
+                    data: data.series
+                }]
+            });
+            $(".loading").fadeOut('slow');
+        });
+        // })
+    }
+
+    function getGA() {
+        // $.ajax('/api/websites', function (resource) {
+        getJSON('/api/websites').then(function (data) {
+            for (const [ga] of Object.entries(data)) {
+                getactiveusers(ga)
+            }
+        })
+    }
+
+    interval(function () {
+        // getactiveusers()
+        getGA()
+
+    }, 100000);
+</script>
+{% include 'default/footer.html.twig' %}
+
+<style>
+    svg.graph-bg {
+        margin: 4px;
+    }
+
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 40%;
+        max-width: 800px;
+    }
+
+    #container {
+        height: 450px;
+    }
+
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+
+    div#graphics {
+        display: flex;
+    }
+
+    .highcharts-title {
+        font-weight: bold;
+    }
+</style>

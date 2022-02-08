@@ -1,19 +1,13 @@
 {% include 'default/header.html.twig' %}
 
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<div id="graphic" class="card" style="display: none"></div>
 
-
-<div id="graphic"  class="card" style="display: none" ></div>
-
+{% include 'default/highcharts.html.twig' %}
 
 <script>
-
     function visitorsOnline() {
-        getJSON('/api/visitors-online.json').then(function (data) {
-            $('#graphic').css({"height": "60em", "margin": "0 auto 2em","padding":"1em", "display": "block"});
+        getJSON('/api/analytics/visitors-online.json').then(function (data) {
+            $('#graphic').css({"height": "60em", "margin": "0 auto 2em", "padding": "1em", "display": "block"});
             Highcharts.chart('graphic', {
                 chart: {
                     type: 'bar'
@@ -60,12 +54,15 @@
                 }]
             });
             $(".loading").fadeOut("slow");
+
+            setTimeout(() => {
+                visitorsOnline()
+            }, 90000);
         });
+
     }
 
-    interval(function(){
-        visitorsOnline()
-    }, 60000);
+    visitorsOnline()
 </script>
 
 {% include 'default/footer.html.twig' %}
