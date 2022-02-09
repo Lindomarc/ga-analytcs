@@ -380,25 +380,6 @@ $application->post('/websites/edit/{id}', function (Silex\Application $applicati
     return false;
 });
 
-$application->get('/websites/permission/{id}', function (Silex\Application $application, $id) {
-    if (!isset($_SESSION['Auth'])) {
-        return $application->redirect('/login');
-    }
-    if (!$_SESSION['Auth']['admin']) {
-        return $application->redirect('/websites');
-    }
-    if ($id) {
-        $data = (new \Controllers\Websites())->permission($id);
-        if (!!$data) {
-            return $application['twig']->render('websites/permission.html.twig', array(
-                'data' => $data,
-                'current' => 'websites'
-            ));
-        }
-    }
-    return $application->redirect('/websites');
-});
-
 $application->post('/websites/permission/{id}', function (Silex\Application $application, $id) {
     if (!isset($_SESSION['Auth'])) {
         return $application->redirect('/login');
@@ -446,5 +427,6 @@ $application->get('/', function (Silex\Application $application) {
 $application->mount('/api/analytics', new Controllers\Api\ApiAnalytics());
 $application->mount('/dashboard', new Controllers\Dashboard());
 $application->mount('/users', new Controllers\Users());
+$application->mount('/websites', new Controllers\Websites());
 //$api->run();
 $application->run();

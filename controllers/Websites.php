@@ -2,10 +2,56 @@
 
 namespace Controllers;
 
+use Model\User;
 use Model\Website;
+use Silex\Application;
+use Silex\ControllerProviderInterface;
 
-class Websites
+class Websites implements ControllerProviderInterface
 {
+    protected $app;
+
+    public function connect(Application $application)
+    {
+
+        $this->app = $application;
+
+        $controllers = $this->app['controllers_factory'];
+
+        $controllers->get(
+            '/',
+            array($this, 'index')
+        );
+        $controllers->get(
+            '/add',
+            array($this, 'add')
+        );
+        $controllers->get(
+            '/edit/{id}',
+            array($this, 'edit')
+        );
+        $controllers->get(
+            '/permission/{id}',
+            array($this, 'permission')
+        );
+
+        $controllers->post(
+            '/add',
+            array($this, 'store')
+        );
+        $controllers->post(
+            '/edit/{id}',
+            array($this, 'update')
+        );
+
+        $controllers->delete(
+            '/delete/{id}',
+            array($this, 'delete')
+        );
+
+        return $controllers;
+    }
+
     static public function list()
     {
         $user_id = $_SESSION['Auth']['id'];
@@ -82,23 +128,47 @@ class Websites
         }
     }
 
-    public function permission($id): array
+    public function permission($id)
     {
+
+        if (!$_SESSION['Auth']['admin']) {
+            return $this->app->redirect('/websites');
+        }
+
+        $user = new \Model\User();
         $website = new Website();
-        $User = new \Model\User();
         $sql = 'SELECT * FROM  websites where id = "' . trim($id) . '"';
         $result['website'] = $website->select($sql)[0];
 
         $sql = "
-        select  id,name, username,email
+        select  id,name, username,email, user_id
         from user_websites
         join users u on u.id = user_websites.user_id
         where website_id = {$id}";
 
         $result['user_websites'] = $website->select($sql);
-        $result['list_users'] = $User::list();
+        $userOptions = [];
 
-        return $result;
+        if (!!$result['user_websites']){
+            $userIds = [];
+            foreach ($result['user_websites'] as $value ){
+                $userIds[] = $value['user_id'];
+            }
+
+
+
+            $userOptions = [
+                'conditions' => [
+                    'where' => 'id NOT IN('.implode(',',$userIds).') '
+                ]
+            ];
+        }
+        $result['list_users'] = $user->list($userOptions);
+
+        return $this->app['twig']->render('websites/permission.html.twig', [
+            'data' => $result,
+            'current' => 'websites'
+        ]);
     }
 
 

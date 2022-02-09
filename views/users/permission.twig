@@ -1,7 +1,7 @@
 {% include 'default/header.html.twig' %}
 <div class="container">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Permissão</h1>
+        <h1 class="h2">Permissões</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
                 <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
@@ -10,15 +10,16 @@
     </div>
     <div class="card">
         <div class="card-header">
-            <h2>GA:{{ data['website']['tracking_id'] }} - {{ data['website']['name'] }}</h2>
+            <h4>Nome:{{ data['user']['name'] }} - Usuário:{{ data['user']['username'] }}</h4>
         </div>
-        <form method="POST" autocomplete="off" class="form-inline m-3">
-            <input type="hidden" value="{{ data['website']['id'] }}" name="website_id" class="form-control">
+        <form method="POST" autocomplete="off" class="form-inline m-3"
+              action="/users/permission/{{ data['user']['id'] }}">
+            <input type="hidden" value="{{ data['user']['id'] }}" name="user_id" class="form-control">
             <div class="form-group mx-sm-3 mb-2">
                 <label for="list-user" class="sr-only">Usuário</label>
-                <select class="form-control" id="list-user" name="user_id" style="min-width: 20rem" required>
+                <select class="form-control" id="list-websites" name="website_id" style="min-width: 20rem" required>
                     <option></option>
-                    {% for row in data['list_users'] %}
+                    {% for row in data['list_websites'] %}
                         <option value="{{ row.id }}">{{ row.name }}</option>
                     {% endfor %}
                 </select>
@@ -29,23 +30,20 @@
         <table class="table">
             <thead>
             <tr>
-                <th scope="col">Nome</th>
-                <th scope="col">Login</th>
-                <th scope="col">E-mail</th>
+                <th scope="col">Nome do Site</th>
+                <th scope="col">GA:XXXX</th>
                 <th scope="col"></th>
             </tr>
             </thead>
             <tbody>
-            {% for row in data['user_websites'] %}
+            {% for row in data['websites'] %}
                 <tr id="user-website-id-{{ row.id }}">
                     <th>{{ row.name }}</th>
-                    <td>{{ row.username }}</td>
-                    <td>{{ row.email }}</td>
+                    <td>{{ row.tracking_id }}</td>
                     <td>  <span
-                                {{ row.id }}
-                                    onclick="deleteItem('{{ row.id }}')"
-                                    type="button"
-                                    class="btn btn-sm btn-danger">
+                                onclick="deleteItem('{{ row.id }}')"
+                                type="button"
+                                class="btn btn-sm btn-danger">
                                 Remover
                             </span>
                     </td>
@@ -58,12 +56,12 @@
 {% include 'default/footer.html.twig' %}
 
 <script>
-    function deleteItem(id) {
+    function deleteItem(website_id) {
         if (confirm('Vocẽ deseja remover esse item?')) {
             let data = {
                 delete: true,
-                user_id: id,
-                website_id: {{ data['website']['id'] }}
+                user_id: {{ data['user']['id'] }},
+                website_id: website_id
             }
             $.ajax({
                 url: `/websites/permission_delete`,
@@ -71,7 +69,7 @@
                 method: 'post',
                 success: function (response) {
                     if (response) {
-                        location.reload();
+                        $(`#user-website-id-${website_id}`).remove()
                     }
                 }
             });

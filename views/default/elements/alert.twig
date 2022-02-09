@@ -1,0 +1,10 @@
+{% set flash = app.session.get('flashMassage') %}
+
+{{ flash }}
+{% if flash %}
+    {% for row in flash %}
+        <div class="alert alert-{{ row.type }}" role="alert">
+            {{ row.message }}
+        </div>
+    {% endfor %}
+{% endif %}

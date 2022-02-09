@@ -1,0 +1,41 @@
+{% include 'default/header.html.twig' %}
+<div class="container">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Editar</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="/users/add" class="btn btn-sm btn-outline-primary">Adicionar</a>
+                <a href="/users" class="btn btn-sm btn-success">Consultar</a>
+            </div>
+        </div>
+    </div>
+    <div id="alert">
+        {% include 'default/elements/alert.twig' %}
+    </div>
+    <div class="card">
+        <div class="card-header"></div>
+        <form method="POST" autocomplete="off" class="row m-3">
+            <div class="form-group col-md-6">
+                <label for="name">Nome:</label>
+                <input type="text" value="{{ data.name ? data.name :'' }}" name="name" class="form-control" placeholder="Nome" id="name" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="name">Username:</label>
+                <input type="text" value="{{ data.username }}" name="username" class="form-control" placeholder="Username" id="name" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="name">E-mail:</label>
+                <input type="email" value="{{ data.email }}" name="email" class="form-control" placeholder="E-mail" id="email" required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="password">Senha:</label>
+                <input type="password"   name="password" class="form-control" placeholder="******" id=password">
+            </div>
+            <div class="form-group col-md-12">
+                <button type="submit" class="btn btn-primary  btn-sm">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% include 'default/footer.html.twig' %}
+<script>$(".loading").hide();</script>

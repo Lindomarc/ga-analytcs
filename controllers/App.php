@@ -6,20 +6,14 @@ use Silex\Application,
     Symfony\Component\HttpFoundation\Request,
     Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class Websites implements ControllerProviderInterface
+class App   implements ControllerProviderInterface
 {
     protected $app;
 
     public function connect(Application $application)
     {
         $this->app   = $application;
-        $controllers = $this->app['controllers_factory'];
-
-        $controllers->get(
-            '/',
-            array($this, 'getAllBlogPosts')
-        );
-        return $controllers;
+        return $application['controllers_factory'];
     }
 
     public function render($request, Exception $e)

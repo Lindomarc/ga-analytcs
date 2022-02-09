@@ -4,58 +4,61 @@
         <h1 class="h2">Lista de Usuários</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
-                <a href="/users/add"  class="btn btn-sm btn-outline-primary">Adicionar</a>
+                <a href="/users/add" class="btn btn-sm btn-outline-primary">Adicionar</a>
             </div>
         </div>
     </div>
     <div class="card">
         <div class="card-header"></div>
-            <table class="table table-striped table-sm ">
-                <thead>
-                <th>id</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th></th>
-                </thead>
-                <tbody>
-                {% for row in data.users %}
-                    <tr id="item-id-{{ row.id }}">
-                        <td>{{ row.id }}</td>
-                        <td>{{ row.name }}</td>
-                        <td>{{ row.email }}</td>
-                        <td class="justify-content-between">
-                            <a href="/websites/permission/{{ row.id }}" class="btn btn-default btn-sm">Permissão</a>
-                            <a href="/websites/edit/{{ row.id }}" class="btn btn-primary btn-sm">Editar</a>
-                            <span
+        <table class="table table-striped table-sm ">
+            <thead>
+            <th>#</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th></th>
+            </thead>
+            <tbody>
+            {% for row in data.users %}
+                <tr id="item-id-{{ row.id }}">
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.email }}</td>
+                    <td class="justify-content-between">
+                        <a href="/users/permission/{{ row.id }}" class="btn btn-default btn-sm">Permissão</a>
+                        <a href="/users/edit/{{ row.id }}" class="btn btn-primary btn-sm">Editar</a>
+                        <span
                                 {{ row.id }}
                                     onclick="deleteItem('{{ row.id }}')"
                                     type="button"
                                     class="btn btn-sm btn-danger">
                                 Remover
                             </span>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% include 'default/footer.html.twig' %}
 
 <script>
     function deleteItem(id) {
-        if (confirm('Vocẽ deseja remover esse item?')) {
+        if (confirm(`Vocẽ deseja remover este Usuário? #${id}`)) {
             let data = {
                 delete: true,
                 id: id
             }
-            $.post(`/users/delete`, data,
-                function (response) {
-                    if (response) {
+            $.ajax({
+                url: `/users/delete/${id}`,
+                data: data,
+                method: 'delete',
+                success: function (response) {
+                    if (response['status'] === true) {
                         $(`#item-id-${id}`).remove()
                     }
                 }
-            );
+            })
         }
     }
 
