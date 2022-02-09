@@ -2,7 +2,6 @@
 
 namespace Controllers;
 
-use Model\User;
 use Model\Website;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
@@ -52,28 +51,28 @@ class Websites implements ControllerProviderInterface
         return $controllers;
     }
 
-    static public function list()
+    static public function list($limit = false)
     {
         $user_id = $_SESSION['Auth']['id'];
-        if (!!$_SESSION['Auth']['admin']) {
-//            $sql = "SELECT * FROM  websites where user_id = '$user_id}';";
-            $sql = "
-                select  *
-                from websites
-            ";
-        } else {
 
+        if ( $limit ) {
             $sql = "
                 select  *
                 from user_websites
                 join websites w on w.id = user_websites.website_id
                 where user_id = {$user_id};
             ";
+        } else {
+            $sql = "
+                select  *
+                from websites
+            ";
         }
-        $rows = (new Website())->select($sql);
-        $data = [];
 
-        if ($rows)
+        $rows = (new Website())->select($sql);
+
+        $data = [];
+        if ($rows) {
             foreach ($rows as $key => $row) {
                 if (!!$row['id']) {
                     $data[$row['tracking_id']]['id'] = $row['id'];
@@ -89,15 +88,17 @@ class Websites implements ControllerProviderInterface
                 }
 
             }
+        }
 
         return $data;
     }
 
     static public function websiteName($ga)
     {
-        $website =self::list();
+        $website = self::list();
         return $website[$ga]['name'];
     }
+
     public function store()
     {
         $website = new Website();
@@ -149,17 +150,16 @@ class Websites implements ControllerProviderInterface
         $result['user_websites'] = $website->select($sql);
         $userOptions = [];
 
-        if (!!$result['user_websites']){
+        if (!!$result['user_websites']) {
             $userIds = [];
-            foreach ($result['user_websites'] as $value ){
+            foreach ($result['user_websites'] as $value) {
                 $userIds[] = $value['user_id'];
             }
 
 
-
             $userOptions = [
                 'conditions' => [
-                    'where' => 'id NOT IN('.implode(',',$userIds).') '
+                    'where' => 'id NOT IN(' . implode(',', $userIds) . ') '
                 ]
             ];
         }
@@ -243,20 +243,20 @@ class Websites implements ControllerProviderInterface
 
     public function delete()
     {
-            $website = new Website();
-            $sql = 'SELECT * FROM  websites where id = "' . $_POST['id'] . '";';
-            $item = $website->select($sql);
-            if (isset($item[0])) {
-                $sql = 'DELETE FROM websites WHERE id = "' . $_POST['id'] . '"';
-               if($website->query($sql)){
-                   $sql = '
+        $website = new Website();
+        $sql = 'SELECT * FROM  websites where id = "' . $_POST['id'] . '";';
+        $item = $website->select($sql);
+        if (isset($item[0])) {
+            $sql = 'DELETE FROM websites WHERE id = "' . $_POST['id'] . '"';
+            if ($website->query($sql)) {
+                $sql = '
                         DELETE FROM user_websites
                         WHERE website_id = "' . $_POST['id'] . '"
                     ';
-                   $website->query($sql);
-               }
-               return  true;
+                $website->query($sql);
             }
+            return true;
+        }
         return false;
     }
 }

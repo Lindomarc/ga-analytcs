@@ -97,34 +97,37 @@ class Users implements ControllerProviderInterface
         if (!$_SESSION['Auth']['admin']) {
             return $this->app->redirect('/users');
         }
+        $website = new Website();
+        $result = $website->getUserWebsites($id);
+
         $user = new \Model\User();
         $result['user'] = $user->getId($id);
 
 
-        $sql = '
-        SELECT  websites.id, websites.name ,tracking_id 
-        FROM user_websites
-        JOIN websites 
-            ON websites.id = user_websites.website_id
-        WHERE user_id = ' . $id;
-        $website = new Website();
-        $result['websites'] = $website->select($sql);
-
-        $userOptions = [];
-        if (!!$result['websites']) {
-            foreach ($result['websites'] as $website) {
-                $websitesIds[] = $website['id'];
-            }
-            $ids = implode(',', $websitesIds);
-            $userOptions = [
-                'fields' => 'id,name',
-                'conditions' => [
-                    'where' => 'id NOT IN(' . $ids . ')'
-                ]
-            ];
-        }
-        $website = new Website();
-        $result['list_websites'] = $website->list($userOptions);
+//        $sql = '
+//        SELECT  websites.id, websites.name ,tracking_id
+//        FROM user_websites
+//        JOIN websites
+//            ON websites.id = user_websites.website_id
+//        WHERE user_id = ' . $id;
+//        $website = new Website();
+//        $result['websites'] = $website->select($sql);
+//
+//        $userOptions = [];
+//        if (!!$result['websites']) {
+//            foreach ($result['websites'] as $website) {
+//                $websitesIds[] = $website['id'];
+//            }
+//            $ids = implode(',', $websitesIds);
+//            $userOptions = [
+//                'fields' => 'id,name',
+//                'conditions' => [
+//                    'where' => 'id NOT IN(' . $ids . ')'
+//                ]
+//            ];
+//        }
+//        $website = new Website();
+//        $result['list_websites'] = $website->list($userOptions);
 
 
         return $this->app['twig']->render('users/permission.twig', [

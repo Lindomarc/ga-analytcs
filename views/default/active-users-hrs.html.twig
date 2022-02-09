@@ -6,7 +6,7 @@
 {% include 'default/highcharts.html.twig' %}
 
 <script>
-    async function activeUsersHrs() {
+    function activeUsersHrs() {
         getJSON('/api/analytics/active-users-hrs.json')
             .then((data) => {
                 data.forEach(function (value) {
@@ -64,10 +64,11 @@
                     });
                     $(".loading").fadeOut('slow');
                 })
-                setTimeout(()=>{
-                    activeUsersHrs()
+                setTimeout(async () => {
+                    await activeUsersHrs()
                 },90000)
-            })
+            }
+        )
     }
     activeUsersHrs()
 </script>

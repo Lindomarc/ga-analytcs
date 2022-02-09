@@ -2,6 +2,7 @@
 namespace Controllers\Api;
 
 use Controllers\Analytics;
+use Model\Website;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -38,11 +39,10 @@ class ApiAnalytics implements ControllerProviderInterface
             return $this->app->redirect('/login');
         }
 
-        $websites = \Controllers\Websites::list();
+        $websites = \Controllers\Websites::list(true);
 
         $items = $categories = $series = [];
         if ($websites) {
-
             foreach ($websites as $name => $website) {
                 try {
                     $items[$website['name']] = (int)Analytics::visitors($this->service, $website['tracking_id']);
@@ -67,7 +67,7 @@ class ApiAnalytics implements ControllerProviderInterface
 
     public function activeUsersHrs()
     {
-        $websites = \Controllers\Websites::list();
+        $websites = \Controllers\Websites::list(true);
         $results = [];
         foreach ($websites as $ga => $website){
             $results[] = $this->activeUsersHrsGa($ga);
