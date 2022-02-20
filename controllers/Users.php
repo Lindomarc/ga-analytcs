@@ -14,7 +14,6 @@ class Users implements ControllerProviderInterface
 
     public function connect(Application $application)
     {
-
         $this->app = $application;
         $controllers = $this->app['controllers_factory'];
 
@@ -38,6 +37,10 @@ class Users implements ControllerProviderInterface
             '/permission/{id}',
             array($this, 'permissionAdd')
         );
+        $controllers->post(
+            '/permission_delete',
+            array($this, 'permissionDelete')
+        );
 
         $controllers->post(
             '/add',
@@ -52,12 +55,15 @@ class Users implements ControllerProviderInterface
             '/delete/{id}',
             array($this, 'delete')
         );
-
         return $controllers;
     }
 
     public function index()
     {
+
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $options = [
             'fields' => 'id,name,email'
         ];
@@ -79,6 +85,9 @@ class Users implements ControllerProviderInterface
 
     public function edit($id)
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $user = new User();
         $result = $user->getId($id);
         return $this->app['twig']->render('users/edit.twig', [
@@ -94,8 +103,8 @@ class Users implements ControllerProviderInterface
 
     public function permission($id)
     {
-        if (!$_SESSION['Auth']['admin']) {
-            return $this->app->redirect('/users');
+        if (!isAuth()){
+            return $this->app->redirect('/login');
         }
         $website = new Website();
         $result = $website->getUserWebsites($id);
@@ -104,30 +113,31 @@ class Users implements ControllerProviderInterface
         $result['user'] = $user->getId($id);
 
 
-//        $sql = '
-//        SELECT  websites.id, websites.name ,tracking_id
-//        FROM user_websites
-//        JOIN websites
-//            ON websites.id = user_websites.website_id
-//        WHERE user_id = ' . $id;
-//        $website = new Website();
-//        $result['websites'] = $website->select($sql);
-//
-//        $userOptions = [];
-//        if (!!$result['websites']) {
-//            foreach ($result['websites'] as $website) {
-//                $websitesIds[] = $website['id'];
-//            }
-//            $ids = implode(',', $websitesIds);
-//            $userOptions = [
-//                'fields' => 'id,name',
-//                'conditions' => [
-//                    'where' => 'id NOT IN(' . $ids . ')'
-//                ]
-//            ];
-//        }
-//        $website = new Website();
-//        $result['list_websites'] = $website->list($userOptions);
+        $sql = '
+        SELECT  websites.id, websites.name ,tracking_id, user_websites.id as ws_id
+        FROM user_websites
+        JOIN websites
+            ON websites.id = user_websites.website_id
+        WHERE user_id = ' . $id;
+
+        $website = new Website();
+        $result['websites'] = $website->select($sql);
+
+        $userOptions = [];
+        if (!!$result['websites']) {
+            foreach ($result['websites'] as $website) {
+                $websitesIds[] = $website['id'];
+            }
+            $ids = implode(',', $websitesIds);
+            $userOptions = [
+                'fields' => 'id,name',
+                'conditions' => [
+                    'where' => 'id NOT IN(' . $ids . ')'
+                ]
+            ];
+        }
+        $website = new Website();
+        $result['list_websites'] = $website->list($userOptions);
 
 
         return $this->app['twig']->render('users/permission.twig', [
@@ -138,6 +148,9 @@ class Users implements ControllerProviderInterface
 
     public function permissionAdd($id)
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $data = $_POST;
         $userOptions = [
             'conditions' => [
@@ -159,6 +172,9 @@ class Users implements ControllerProviderInterface
 
     public function store()
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $user = new User();
         $data = $_POST;
         if ($user->unique(['email', 'username'], $data) && !!$data['password']) {
@@ -172,6 +188,9 @@ class Users implements ControllerProviderInterface
 
     public function update($id)
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $user = new User();
         $data = $_POST;
         $data['id'] = $id;
@@ -188,8 +207,23 @@ class Users implements ControllerProviderInterface
 
     public function delete($id)
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $user = new User();
         $response['status'] = $user->delete($id);
+        return $this->app->json($response);
+    }
+
+    public function permissionDelete()
+    {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
+
+        $userWebsite = new UserWebsite();
+        if ($_POST['delete'])
+        $response['status'] = $userWebsite->delete($_POST['id']);
         return $this->app->json($response);
     }
 

@@ -1,33 +1,33 @@
 {% include 'default/header.html.twig' %}
-<div class="container">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Editar</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-                <a href="/websites/add" class="btn btn-sm btn-outline-primary">Adicionar</a>
-                <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
-            </div>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Editar</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="/websites/add" class="btn btn-sm btn-outline-primary">Adicionar</a>
+            <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header"></div>
-        <form method="POST" autocomplete="off" class="row m-3">
-
-            <div class="form-group  col-md-6">
-                <label for="tracking_id">Númeor GA:</label>
-                <input type="text" value="{{ data['tracking_id'] }}" name="tracking_id" class="form-control"
-                       placeholder="Número GA:" id="tracking_id" disabled>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="name">Nome do Site:</label>
-                <input type="text" value="{{ data['name'] }}" name="name" class="form-control"
-                       placeholder="Nome do Site" id="name" required>
-            </div>
-            <div class="form-group col-md-12">
-                <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
-            </div>
-        </form>
-    </div>
 </div>
+<div class="card table-responsive">
+    <div class="card-header"></div>
+    <form method="POST" autocomplete="off" class="row m-3">
+
+        <div class="form-group  col-md-6">
+            <label for="tracking_id">Númeor GA:</label>
+            <input type="text" value="{{ data['tracking_id'] }}" name="tracking_id" class="form-control"
+                   placeholder="Número GA:" id="tracking_id" disabled>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="name">Nome do Site:</label>
+            <input type="text" value="{{ data['name'] }}" name="name" class="form-control"
+                   placeholder="Nome do Site" id="name" required>
+        </div>
+        <div class="form-group col-md-12">
+            <button type="submit" class="btn btn-primary btn-sm">Salvar</button>
+        </div>
+    </form>
+</div>
+
 {% include 'default/footer.html.twig' %}
 <script>$(".loading").hide();</script>

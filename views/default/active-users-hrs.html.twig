@@ -5,70 +5,72 @@
 
 {% include 'default/highcharts.html.twig' %}
 
+{% include 'default/footer.html.twig' %}
+
 <script>
     function activeUsersHrs() {
         getJSON('/api/analytics/active-users-hrs.json')
             .then((data) => {
-                data.forEach(function (value) {
+                    data.forEach(function (value) {
 
-                    if (!$(`#graphics div#${value['ga']}`)[0]) {
-                        $('#graphics').append(`
+                        if (!$(`#graphics div#${value['ga']}`)[0]) {
+                            $('#graphics').append(`
                         <div id="${value['ga']}" class="col-sm-12 col-md-4">
                             <figure class="highcharts-figure card">
                                 <div id="chart-${value['ga']}" ></div>
                             </figure>
                         </div>`)
-                    }
-                    Highcharts.chart(`chart-${value['ga']}`, {
-                        chart: {
-                            type: 'area'
-                        },
-                        title: {
-                            text: `${value['name']} - (<span class="visitors">${value['visitors']}</span>)`
-                        },
-                        xAxis: {
-                            categories: value['hrs']
-                        },
-                        yAxis: {
-                            title: {
-                                text: false
+                        }
+                        Highcharts.chart(`chart-${value['ga']}`, {
+                            chart: {
+                                type: 'area'
                             },
-                            labels: {
-                                formatter: function () {
-                                    return this.value;
+                            title: {
+                                text: `${value['name']} - (<span class="visitors">${value['visitors']}</span>)`
+                            },
+                            xAxis: {
+                                categories: value['hrs']
+                            },
+                            yAxis: {
+                                title: {
+                                    text: false
+                                },
+                                labels: {
+                                    formatter: function () {
+                                        return this.value;
+                                    }
                                 }
-                            }
-                        },
-                        tooltip: {
-                            pointFormat: '<b>{point.y:,.0f}</b> {series.name} por hora'
-                        },
-                        plotOptions: {
-                            area: {
-                                pointStart: 1,
-                                marker: {
-                                    enabled: false,
-                                    symbol: 'circle',
-                                    radius: 2,
-                                    states: {
-                                        hover: {
-                                            enabled: true
+                            },
+                            tooltip: {
+                                pointFormat: '<b>{point.y:,.0f}</b> {series.name} por hora'
+                            },
+                            plotOptions: {
+                                area: {
+                                    pointStart: 1,
+                                    marker: {
+                                        enabled: false,
+                                        symbol: 'circle',
+                                        radius: 2,
+                                        states: {
+                                            hover: {
+                                                enabled: true
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        },
-                        series: [{
-                            name: 'Visitantes',
-                            data: value['series']
-                        }]
-                    });
-                    $(".loading").fadeOut('slow');
-                })
-                setTimeout(async () => {
-                    await activeUsersHrs()
-                },90000)
-            }
-        )
+                            },
+                            series: [{
+                                name: 'Visitantes',
+                                data: value['series']
+                            }]
+                        });
+                    })
+                    //hideLoading();
+                    setTimeout(async () => {
+                        await activeUsersHrs()
+                    },90000)
+                }
+            )
     }
     activeUsersHrs()
 </script>
@@ -132,5 +134,3 @@
         font-weight: bold;
     }
 </style>
-
-{% include 'default/footer.html.twig' %}

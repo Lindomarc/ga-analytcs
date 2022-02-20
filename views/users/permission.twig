@@ -1,14 +1,13 @@
 {% include 'default/header.html.twig' %}
-<div class="container">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Permissões</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
-                <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
+                <a href="/users" class="btn btn-sm btn-success">Consultar</a>
             </div>
         </div>
     </div>
-    <div class="card">
+<div class="card table-responsive">
         <div class="card-header">
             <h4>Nome:{{ data['user']['name'] }} - Usuário:{{ data['user']['username'] }}</h4>
         </div>
@@ -37,11 +36,11 @@
             </thead>
             <tbody>
             {% for row in data['websites'] %}
-                <tr id="user-website-id-{{ row.id }}">
+                <tr id="user-website-id-{{ row.ws_id }}">
                     <th>{{ row.name }}</th>
                     <td>{{ row.tracking_id }}</td>
                     <td>  <span
-                                onclick="deleteItem('{{ row.id }}')"
+                                onclick="deleteItem('{{ row.ws_id }}')"
                                 type="button"
                                 class="btn btn-sm btn-danger">
                                 Remover
@@ -52,24 +51,22 @@
             </tbody>
         </table>
     </div>
-</div>
 {% include 'default/footer.html.twig' %}
 
 <script>
-    function deleteItem(website_id) {
+    function deleteItem(id) {
         if (confirm('Vocẽ deseja remover esse item?')) {
             let data = {
                 delete: true,
-                user_id: {{ data['user']['id'] }},
-                website_id: website_id
+                id: id
             }
             $.ajax({
-                url: `/websites/permission_delete`,
+                url: `/users/permission_delete`,
                 data: data,
                 method: 'post',
                 success: function (response) {
                     if (response) {
-                        $(`#user-website-id-${website_id}`).remove()
+                        $(`#user-website-id-${id}`).remove()
                     }
                 }
             });

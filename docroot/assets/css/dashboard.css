@@ -18,17 +18,30 @@ body {
     bottom: 0;
     left: 0;
     z-index: 100; /* Behind the navbar */
-    padding: 0;
+    padding: 48px 0 0; /* Height of navbar */
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
 
+@media (max-width: 767.98px) {
+    .sidebar {
+        top: 0;
+    }
+}
+
 .sidebar-sticky {
-    position: fixed;
-    top: 48px; /* Height of navbar */
+    position: relative;
+    top: 0;
     height: calc(100vh - 48px);
     padding-top: .5rem;
     overflow-x: hidden;
     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+@supports ((position: -webkit-sticky) or (position: sticky)) {
+    .sidebar-sticky {
+        position: -webkit-sticky;
+        position: sticky;
+    }
 }
 
 .sidebar .nav-link {
@@ -60,11 +73,16 @@ body {
  */
 
 .navbar-brand {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
+    padding-top: .75rem !important;
+    padding-bottom: .75rem!important;
     font-size: 1rem;
     background-color: rgba(0, 0, 0, .25);
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+
+.navbar .navbar-toggler {
+    top: .25rem;
+    right: 1rem;
 }
 
 .navbar .form-control {
@@ -83,73 +101,3 @@ body {
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
-
-/*
- * Utilities
- */
-
-.border-top { border-top: 1px solid #e5e5e5; }
-.border-bottom { border-bottom: 1px solid #e5e5e5; }
-
-/**
-loading
- */
-:root {
-    --yellow: #feb60a;
-    --red: #ff0062;
-    --blue: #00dbf9;
-    --violet: #da00f7;
-    --violet: #da00f7;
-}
-
-div.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: calc(50vh);
-    width: 75%;
-}
-div.loading > div {
-    width: 0.7vw;
-    height: 0.7vw;
-    border-radius: 100%;
-    margin: 1vw;
-    background-image: linear-gradient(145deg, rgba(255,255,255,0.5) 0%, rgba(0,0,0,0) 100%);
-    animation: bounce 1.5s 0.5s linear infinite;
-}
-.yellow {
-    background-color: var(--yellow);
-}
-
-.red {
-    background-color: var(--red);
-    animation-delay: 0.1s;
-}
-
-.blue {
-    background-color: var(--blue);
-    animation-delay: 0.2s;
-}
-
-.violet {
-    background-color: var(--violet);
-    animation-delay: 0.3s;
-}
-
-@keyframes bounce {
-    0%, 50%, 100% {
-        transform: scale(1);
-        filter: blur(0px);
-    }
-    25% {
-        transform: scale(0.6);
-        filter: blur(3px);
-    }
-    75% {
-        filter: blur(3px);
-        transform: scale(1.4);
-    }
-}
-
-.highcharts-credits{display: none}

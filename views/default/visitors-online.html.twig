@@ -4,6 +4,9 @@
 
 {% include 'default/highcharts.html.twig' %}
 
+
+{% include 'default/footer.html.twig' %}
+
 <script>
     function visitorsOnline() {
         getJSON('/api/analytics/visitors-online.json').then(function (data) {
@@ -53,16 +56,15 @@
                     data: data.series
                 }]
             });
-            $(".loading").fadeOut("slow");
 
+            hideLoading();
             setTimeout(() => {
                 visitorsOnline()
             }, 90000);
         });
 
     }
-
-    visitorsOnline()
+    $(()=>{
+        visitorsOnline()
+    })
 </script>
-
-{% include 'default/footer.html.twig' %}

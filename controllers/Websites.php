@@ -2,9 +2,11 @@
 
 namespace Controllers;
 
+use Model\UserWebsite;
 use Model\Website;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class Websites implements ControllerProviderInterface
 {
@@ -35,6 +37,16 @@ class Websites implements ControllerProviderInterface
         );
 
         $controllers->post(
+            '/permission/{id}',
+            array($this, 'permissionAdd')
+        );
+
+        $controllers->post(
+            '/permission_delete',
+            array($this, 'permissionDelete')
+        );
+
+        $controllers->post(
             '/add',
             array($this, 'store')
         );
@@ -51,9 +63,22 @@ class Websites implements ControllerProviderInterface
         return $controllers;
     }
 
+    public function index()
+    {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
+        return $this->app['twig']->render('websites/index.html.twig', array(
+            'data' => \Controllers\Websites::list(),
+            'isAdmin' => $_SESSION['Auth']['admin'],
+            'current' => 'websites'
+        ));
+    }
+
     static public function list($limit = false)
     {
-        $user_id = $_SESSION['Auth']['id'];
+        $session = (new Session())->get('Auth');
+        $user_id = $session['id'];
 
         if ( $limit ) {
             $sql = "
@@ -73,7 +98,7 @@ class Websites implements ControllerProviderInterface
 
         $data = [];
         if ($rows) {
-            foreach ($rows as $key => $row) {
+            foreach ($rows as $row) {
                 if (!!$row['id']) {
                     $data[$row['tracking_id']]['id'] = $row['id'];
                 }
@@ -101,6 +126,9 @@ class Websites implements ControllerProviderInterface
 
     public function store()
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $website = new Website();
         $sql = 'SELECT count(*)
                 FROM  websites 
@@ -131,9 +159,8 @@ class Websites implements ControllerProviderInterface
 
     public function permission($id)
     {
-
-        if (!$_SESSION['Auth']['admin']) {
-            return $this->app->redirect('/websites');
+        if (!isAuth()){
+            return $this->app->redirect('/login');
         }
 
         $user = new \Model\User();
@@ -142,12 +169,13 @@ class Websites implements ControllerProviderInterface
         $result['website'] = $website->select($sql)[0];
 
         $sql = "
-        select  id,name, username,email, user_id
+        select user_websites.id, name, username,email, user_id
         from user_websites
         join users u on u.id = user_websites.user_id
-        where website_id = {$id}";
+        where website_id = {$id} ";
 
         $result['user_websites'] = $website->select($sql);
+
         $userOptions = [];
 
         if (!!$result['user_websites']) {
@@ -155,11 +183,9 @@ class Websites implements ControllerProviderInterface
             foreach ($result['user_websites'] as $value) {
                 $userIds[] = $value['user_id'];
             }
-
-
             $userOptions = [
                 'conditions' => [
-                    'where' => 'id NOT IN(' . implode(',', $userIds) . ') '
+                    'where' => 'id NOT IN(' . implode(',', $userIds) . ')',
                 ]
             ];
         }
@@ -172,8 +198,11 @@ class Websites implements ControllerProviderInterface
     }
 
 
-    public function edit($id): array
+    public function edit($id)
     {
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $website = new Website();
         $sql = 'SELECT * FROM  websites where id = "' . trim($id) . '"';
         $result = $website->select($sql);
@@ -197,8 +226,12 @@ class Websites implements ControllerProviderInterface
         return false;
     }
 
-    public function permissionAdd()
+    public function permissionAdd($id)
     {
+
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $website = new Website();
         $sql = '
             SELECT * 
@@ -215,34 +248,29 @@ class Websites implements ControllerProviderInterface
                 '" . trim($_POST['user_id']) . "', 
                 '" . trim($_POST['website_id']) . "'
             )";
-            return $website->query($sql);
+            $website->query($sql);
         }
-        return false;
+        return $this->app->redirect('/websites/permission/'.$id);
     }
 
-    public function permissionDelete()
+
+
+    public function permissionDelete($id)
     {
-        $website = new Website();
-        $sql = '
-            SELECT * 
-            FROM  user_websites 
-            WHERE user_id = "' . trim($_POST['user_id']) . '"
-            AND website_id = "' . trim($_POST['website_id']) . '"
-        ';
-        $item = $website->select($sql);
-        if (isset($item[0]['user_id'])) {
-            $sql = '
-                DELETE FROM user_websites
-                WHERE user_id = "' . trim($_POST['user_id']) . '"
-                AND website_id = "' . trim($_POST['website_id']) . '"
-            ';
-            return $website->query($sql);
+        if (!isAuth()){
+            return $this->app->redirect('/login');
         }
-        return false;
+        $userWebsite = new UserWebsite();
+        $response['status'] = $userWebsite->delete($id);
+        return $this->app->json($response);
     }
 
     public function delete()
     {
+
+        if (!isAuth()){
+            return $this->app->redirect('/login');
+        }
         $website = new Website();
         $sql = 'SELECT * FROM  websites where id = "' . $_POST['id'] . '";';
         $item = $website->select($sql);

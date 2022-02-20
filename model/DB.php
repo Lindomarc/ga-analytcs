@@ -7,7 +7,7 @@ use SQLite3;
 class DB extends SQLite3
 {
 
-    private string $sqlite = __DIR__ . '/sqlite/database.db';
+    protected string $sqlite = __DIR__ . '/sqlite/database.db';
 
     public $table = '';
 

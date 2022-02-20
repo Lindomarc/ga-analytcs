@@ -1,59 +1,57 @@
 {% include 'default/header.html.twig' %}
-<div class="container">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Permissão</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-                <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
-            </div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Permissão</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="/websites" class="btn btn-sm btn-success">Consultar</a>
         </div>
     </div>
-    <div class="card">
-        <div class="card-header">
-            <h2>GA:{{ data['website']['tracking_id'] }} - {{ data['website']['name'] }}</h2>
+</div>
+<div class="card table-responsive">
+    <div class="card-header">
+        <h2>GA:{{ data['website']['tracking_id'] }} - {{ data['website']['name'] }}</h2>
+    </div>
+    <form method="POST" autocomplete="off" class="form-inline m-3">
+        <input type="hidden" value="{{ data['website']['id'] }}" name="website_id" class="form-control">
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="list-user" class="sr-only">Usuário</label>
+            <select class="form-control" id="list-user" name="user_id" style="min-width: 20rem" required>
+                <option></option>
+                {% for row in data['list_users'] %}
+                    <option value="{{ row.id }}">{{ row.name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        <form method="POST" autocomplete="off" class="form-inline m-3">
-            <input type="hidden" value="{{ data['website']['id'] }}" name="website_id" class="form-control">
-            <div class="form-group mx-sm-3 mb-2">
-                <label for="list-user" class="sr-only">Usuário</label>
-                <select class="form-control" id="list-user" name="user_id" style="min-width: 20rem" required>
-                    <option></option>
-                    {% for row in data['list_users'] %}
-                        <option value="{{ row.id }}">{{ row.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary btn-sm mb-2">Adicionar Permissão</button>
-        </form>
+        <button type="submit" class="btn btn-primary btn-sm mb-2">Adicionar Permissão</button>
+    </form>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">Nome</th>
-                <th scope="col">Login</th>
-                <th scope="col">E-mail</th>
-                <th scope="col"></th>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Login</th>
+            <th scope="col">E-mail</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in data['user_websites'] %}
+            <tr id="user-website-id-{{ row.id }}">
+                <th>{{ row.name }}</th>
+                <td>{{ row.username }}</td>
+                <td>{{ row.email }}</td>
+                <td>  <span
+                    {{ row.id }}
+                        onclick="deleteItem('{{ row.id }}')"
+                        type="button"
+                        class="btn btn-sm btn-danger">
+                    Remover
+                </span>
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for row in data['user_websites'] %}
-                <tr id="user-website-id-{{ row.id }}">
-                    <th>{{ row.name }}</th>
-                    <td>{{ row.username }}</td>
-                    <td>{{ row.email }}</td>
-                    <td>  <span
-                                {{ row.id }}
-                                    onclick="deleteItem('{{ row.id }}')"
-                                    type="button"
-                                    class="btn btn-sm btn-danger">
-                                Remover
-                            </span>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% include 'default/footer.html.twig' %}
 
@@ -62,8 +60,7 @@
         if (confirm('Vocẽ deseja remover esse item?')) {
             let data = {
                 delete: true,
-                user_id: id,
-                website_id: {{ data['website']['id'] }}
+                id: id
             }
             $.ajax({
                 url: `/websites/permission_delete`,

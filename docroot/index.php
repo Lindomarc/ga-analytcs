@@ -5,29 +5,11 @@ const ROOT = __DIR__;
 
 require_once ROOT . '/../vendor/autoload.php';
 
-use Controllers\Analytics;
-use Controllers\Users;
-//use Illuminate\Database\Capsule\Manager as Capsule;
-use Middleware\Authentication as MAuth;
-
-
-//$capsule = new Capsule();
-//$capsule->addConnection([
-//    "driver" => "mysql",
-//    "host" => "localhost",
-//    "database" => "database",
-//    "username" => "root",
-//    "password" => "password",
-//    "charset" => "utf8",
-//    "collation" => "utf8_general_ci"
-//]);
-//$capsule->bootEloquent();
-
 
 $application = new Silex\Application();
 
 /* START CONFIGURATION */
-$application['debug'] = true;
+$application['debug'] = false;
 
 $application['config_path'] = __DIR__ . '/../config/config.json';
 /* END CONFIGURATION */
@@ -36,55 +18,50 @@ $application['session.storage.options'] = [
     'cookie_lifetime' => 3600
 ];
 
-//$application->before(function ($request, $application) {
-//    MAuth::authenticate($request, $application);
-//});
 
 $application->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => __DIR__ . '/../log/development.log',
 ));
+
 
 $application->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__ . '/../views',
 ));
 
 $application->register(new Silex\Provider\SessionServiceProvider());
-
 $application['session']->all();
-
+/*
 $application->get('/login', function (Silex\Application $application) {
     return $application['twig']->render('users/login.html.twig');
 });
 
 $application->post('/login', function (Silex\Application $application) {
-
     if ((isset($_POST['username']) && $_POST['username']) && (isset($_POST['password']) && $_POST['password'])) {
+
         $username = trim($_POST['username']);
         $password = $_POST['password'];
-        $user = new \Model\User();
+        $user = new Model\User();
         if ($user->login($username, $password)) {
             return $application->redirect('/');
         }
     }
     return $application['twig']->render('users/login.html.twig');
-});
+});*/
+$application->mount('/login', new Controllers\Authentication());
 
 $application->get('/logout', function (Silex\Application $application) {
-    $application['session']->all();
-    unset($_SESSION['Auth']);
+    $application['session']->clear();
     return $application->redirect('/login');
 });
 
 
-//function websites()
-//{
-//    return Controllers\Websites::list();
-//}
+function isAuth()
+{
+    $Auth = (new \Symfony\Component\HttpFoundation\Session\Session())->get('Auth');
+    return !!$Auth;
+}
 
 $application->get('/api/websites', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
-        return $application->redirect('/login');
-    }
     $data = Controllers\Websites::list();
     return $application->json($data);
 });
@@ -249,10 +226,11 @@ $application->get('/api/get-active-users-online.json', function (Silex\Applicati
 
 
 $application->get('/visitors-online', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
+    if (!isAuth()) {
         return $application->redirect('/login');
     }
-    return $application['twig']->render('default/visitors-online.html.twig',[
+
+    return $application['twig']->render('default/visitors-online.html.twig', [
         'current' => 'visitors-online'
     ]);
 });
@@ -319,19 +297,12 @@ $application->get('/api/visitors-online.json/{ga}', function (Silex\Application 
 });
 */
 
-$application->get('/websites', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
-        return $application->redirect('/login');
-    }
-    return $application['twig']->render('websites/index.html.twig', array(
-        'data' => \Controllers\Websites::list(),
-        'isAdmin' => $_SESSION['Auth']['admin'],
-        'current' => 'websites'
-    ));
-});
+//$application->get('/websites', function (Silex\Application $application) {
+//
+//});
 
 $application->get('/websites/add', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
+    if (!isAuth()) {
         return $application->redirect('/login');
     }
     return $application['twig']->render('websites/add.html.twig', array(
@@ -341,7 +312,7 @@ $application->get('/websites/add', function (Silex\Application $application) {
 });
 
 $application->post('/websites/add', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
+    if (!isAuth()) {
         return $application->redirect('/login');
     }
     if (isset($_POST['tracking_id']) && !!$_POST['tracking_id']) {
@@ -353,7 +324,7 @@ $application->post('/websites/add', function (Silex\Application $application) {
 });
 
 $application->get('/websites/edit/{id}', function (Silex\Application $application, $id) {
-    if (!isset($_SESSION['Auth'])) {
+    if (!isAuth()) {
         return $application->redirect('/login');
     }
     if ($id) {
@@ -369,7 +340,7 @@ $application->get('/websites/edit/{id}', function (Silex\Application $applicatio
 });
 
 $application->post('/websites/edit/{id}', function (Silex\Application $application, $id) {
-    if (!isset($_SESSION['Auth'])) {
+    if (!isAuth()) {
         return $application->redirect('/login');
     }
     if ($id) {
@@ -380,33 +351,33 @@ $application->post('/websites/edit/{id}', function (Silex\Application $applicati
     return false;
 });
 
-$application->post('/websites/permission/{id}', function (Silex\Application $application, $id) {
-    if (!isset($_SESSION['Auth'])) {
-        return $application->redirect('/login');
-    }
-    if (!$_SESSION['Auth']['admin']) {
-        return $application->redirect('/websites');
-    }
-    if (isset($_POST['user_id']) && isset($_POST['website_id'])) {
-        (new \Controllers\Websites())->permissionAdd();
-    }
-    return $application->redirect('/websites/permission/' . $id);
+//$application->post('/websites/permission/{id}', function (Silex\Application $application, $id) {
+//    if (!isAuth()) {
+//        return $application->redirect('/login');
+//    }
+//
+//    if (isset($_POST['user_id']) && isset($_POST['website_id'])) {
+//        (new \Controllers\Websites())->permissionAdd();
+//    }
+//    return $application->redirect('/websites/permission/' . $id);
+//
+//});
 
-});
-
-$application->post('/websites/permission_delete', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
-        return $application->redirect('/login');
-    }
-    if (isset($_POST['user_id']) && isset($_POST['website_id'])) {
-        (new \Controllers\Websites())->permissionDelete();
-    }
-    return $application->redirect('/websites');
-
-});
+//$application->post('/websites/permission_delete', function (Silex\Application $application) {
+//    if (!isAuth()) {
+//        return $application->redirect('/login');
+//    }
+//    if (isset($_POST['user_id']) && isset($_POST['website_id'])) {
+//        (new \Controllers\Websites())->permissionDelete();
+//    }
+//    return $application->redirect('/websites');
+//
+//});
 
 $application->post('/websites/delete', function (Silex\Application $application) {
-
+    if (!isAuth()) {
+        return $application->redirect('/login');
+    }
 
     if (isset($_POST['id']) && !!$_POST['id']) {
         (new \Controllers\Websites())->delete();
@@ -414,19 +385,23 @@ $application->post('/websites/delete', function (Silex\Application $application)
     return $application->redirect('/websites');
 });
 
+//echo Authentication::isAuth();
 
 //$api = new Silex\Application();
 
 $application->get('/', function (Silex\Application $application) {
-    if (!isset($_SESSION['Auth'])) {
+    if (
+        !isAuth()) {
         return $application->redirect('/login');
     }
     return $application->redirect('/dashboard');
 });
 
+
 $application->mount('/api/analytics', new Controllers\Api\ApiAnalytics());
 $application->mount('/dashboard', new Controllers\Dashboard());
 $application->mount('/users', new Controllers\Users());
 $application->mount('/websites', new Controllers\Websites());
-//$api->run();
+
+
 $application->run();

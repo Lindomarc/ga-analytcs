@@ -1,3 +1,15 @@
+function showLoading() {
+    $("body nav, body div.container-fluid").addClass('page-loading');
+
+}
+// showLoading()
+function hideLoading() {
+    $("body nav, body div.container-fluid").removeClass('page-loading');
+    $(".loading").fadeOut()
+
+}
+
+
 const getJSON = function (url) {
     let finished = false;
     let cancel = () => finished = true;
@@ -56,6 +68,11 @@ function interval(func, times){
 
     setTimeout(interv);
 }
+
+$(document).ready(function() {
+    feather.replace()
+});
+
 /*
 function reqRepeat (code = 0) {
     let time;

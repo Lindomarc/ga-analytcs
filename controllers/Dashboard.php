@@ -11,7 +11,6 @@ class Dashboard implements ControllerProviderInterface
 
     public function connect(Application $application)
     {
-
         $this->app = $application;
         $controllers = $this->app['controllers_factory'];
 
@@ -26,6 +25,9 @@ class Dashboard implements ControllerProviderInterface
 
     public function index()
     {
+        if (!isAuth()) {
+            return $this->app->redirect('/login');
+        }
         return $this->app['twig']->render('default/active-users-hrs.html.twig', [
             'data' => Websites::list(),
             'current' => '/dashboard'

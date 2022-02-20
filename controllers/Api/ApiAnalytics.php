@@ -35,9 +35,6 @@ class ApiAnalytics implements ControllerProviderInterface
 
     public function visitorsOnline()
     {
-        if (!isset($_SESSION['Auth'])) {
-            return $this->app->redirect('/login');
-        }
 
         $websites = \Controllers\Websites::list(true);
 

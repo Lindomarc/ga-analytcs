@@ -1,5 +1,5 @@
-<nav id="menu-sidebar" class="col-md-2  d-md-block bg-light sidebar" >
-    <div class="sidebar-sticky">
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+    <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {{ current == '/' ? 'active' : ''  }}" href="/">
@@ -13,6 +13,8 @@
                     Visitantes Online <span class="sr-only"></span>
                 </a>
             </li>
+            {% set Auth = app.session.get('Auth') %}
+            {% if Auth.admin == 1 %}
             <li class="nav-item">
                 <a class="nav-link {{ current == 'websites' ? 'active' : ''  }}" href="/websites">
                     <span data-feather="file"></span>
@@ -25,6 +27,12 @@
                     Usuários
                 </a>
             </li>
+            {% endif %}
+        </ul>
+        <ul class="nav logout justify-content-end d-md-none">
+            <a href="/logout"><span class="btn btn-danger btn-sm">
+                <i data-feather="power"></i> Sair </span>
+            </a>
         </ul>
     </div>
 </nav>
