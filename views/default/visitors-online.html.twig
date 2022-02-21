@@ -9,7 +9,6 @@
 
 <script>
     function visitorsOnline() {
-        showLoading()
         getJSON('/api/analytics/visitors-online.json').then(function (data) {
             $('#graphic').css({"height": "60em", "margin": "0 auto 2em", "padding": "1em", "display": "block"});
             Highcharts.chart('graphic', {
@@ -66,6 +65,7 @@
 
     }
     $(()=>{
+        showLoading()
         visitorsOnline()
     })
 </script>

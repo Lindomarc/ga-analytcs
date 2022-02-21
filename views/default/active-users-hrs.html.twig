@@ -9,7 +9,6 @@
 
 <script>
     function activeUsersHrs() {
-        showLoading()
         getJSON('/api/analytics/active-users-hrs.json')
             .then((data) => {
                     data.forEach(function (value) {
@@ -74,6 +73,7 @@
             )
     }
     activeUsersHrs()
+    showLoading()
 </script>
 
 <style>
