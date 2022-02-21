@@ -9,20 +9,22 @@
 </div>
 <div class="card table-responsive">
     <div class="card-header">
-        <h2>GA:{{ data['website']['tracking_id'] }} - {{ data['website']['name'] }}</h2>
+        <h3>GA:{{ data['website']['tracking_id'] }} - {{ data['website']['name'] }}</h3>
     </div>
     <form method="POST" autocomplete="off" class="form-inline m-3">
         <input type="hidden" value="{{ data['website']['id'] }}" name="website_id" class="form-control">
-        <div class="form-group mx-sm-3 mb-2">
+        <div class="form-group col-12 col-md-4 col-lg-4 ">
             <label for="list-user" class="sr-only">Usuário</label>
-            <select class="form-control" id="list-user" name="user_id" style="min-width: 20rem" required>
+            <select class="form-control" id="list-user" name="user_id" style="width: 100%" required>
                 <option></option>
                 {% for row in data['list_users'] %}
                     <option value="{{ row.id }}">{{ row.name }}</option>
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary btn-sm mb-2">Adicionar Permissão</button>
+        <div class="form-group col-12 col-md-4 col-lg-4 ">
+            <button type="submit" class="btn btn-primary btn-sm mb-2">Adicionar Permissão</button>
+        </div>
     </form>
 
     <table class="table">

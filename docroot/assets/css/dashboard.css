@@ -36,7 +36,7 @@ body {
 }
 
 @supports ((position: -webkit-sticky) or (position: sticky)) {
-    .sidebar-sticky {
+    #sidebarMenu, .sidebar-sticky {
         position: -webkit-sticky;
         position: sticky;
     }
