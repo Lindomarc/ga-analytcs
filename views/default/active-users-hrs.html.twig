@@ -9,6 +9,7 @@
 
 <script>
     function activeUsersHrs() {
+        showLoading()
         getJSON('/api/analytics/active-users-hrs.json')
             .then((data) => {
                     data.forEach(function (value) {
@@ -65,7 +66,7 @@
                             }]
                         });
                     })
-                    //hideLoading();
+                    hideLoading();
                     setTimeout(async () => {
                         await activeUsersHrs()
                     },90000)

@@ -2,11 +2,6 @@ body {
     font-size: .875rem;
 }
 
-.feather {
-    width: 16px;
-    height: 16px;
-    vertical-align: text-bottom;
-}
 
 /*
  * Sidebar
@@ -25,6 +20,9 @@ body {
 @media (max-width: 767.98px) {
     .sidebar {
         top: 0;
+    }
+    .form-signin{
+
     }
 }
 
@@ -101,3 +99,103 @@ body {
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
+
+
+/* LOADING */
+.line {
+    fill: none;
+    stroke: #666;
+    stroke-width: 0px;
+}
+
+.area {
+    fill: #8395A7;
+}
+
+.text-title {
+    fill: #fff;
+    text-anchor: middle;
+    font-size: 20px;
+}
+.text-active {
+    fill: #fff;
+    text-anchor: middle;
+    font-size: 48px;
+    font-weight: bold;
+}
+.yaxis {
+    text-anchor: end;
+    stroke: gray;
+    fill: none;
+    stroke-width: 1px
+}
+
+.graph-bg {
+    background-color: #B7CBE1;
+}
+
+.feather {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+}
+
+
+:root {
+    --yellow: #feb60a;
+    --red: #ff0062;
+    --blue: #00dbf9;
+    --violet: #da00f7;
+    --violet: #da00f7;
+}
+
+div.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: calc(40vh);
+}
+div.loading > div {
+    width: 1.7vw;
+    height: 1.7vw;
+    border-radius: 100%;
+    margin: 1vw;
+    background-image: linear-gradient(145deg, rgba(255,255,255,0.5) 0%, rgba(0,0,0,0) 100%);
+    animation: bounce 1.5s 0.5s linear infinite;
+}
+.yellow {
+    background-color: var(--yellow);
+}
+
+.red {
+    background-color: var(--red);
+    animation-delay: 0.1s;
+}
+
+.blue {
+    background-color: var(--blue);
+    animation-delay: 0.2s;
+}
+
+.violet {
+    background-color: var(--violet);
+    animation-delay: 0.3s;
+}
+
+@keyframes bounce {
+    0%, 50%, 100% {
+        transform: scale(1);
+        filter: blur(0px);
+    }
+    25% {
+        transform: scale(0.6);
+        filter: blur(3px);
+    }
+    75% {
+        filter: blur(3px);
+        transform: scale(1.4);
+    }
+}
+
+.highcharts-credits{display: none}

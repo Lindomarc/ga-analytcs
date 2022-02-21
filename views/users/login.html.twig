@@ -2,37 +2,57 @@
 <head>
     <title>Google Analytics Dashboard</title>
     <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
-    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="/assets/css/dashboard.css">
 
 </head>
 <body>
-<div class="container">
-    <div class="card form-signin m-5 p-5 ">
-        <h2>Sign In</h2>
-        <form method="post">
-            <div class="form-group">
-{#                <label for="username">Username:</label>#}
-                <input type="username" class="form-control" id="username" placeholder="Username" name="username">
-            </div>
-            <div class="form-group">
-{#                <label for="pwd">Password:</label>#}
-                <input type="password" class="form-control" id="pwd" placeholder="Password" name="password">
-            </div>
-            <button type="submit" class="btn btn-primary">Log In</button>
-        </form>
+<div class="container mt-5">
+    <div class=" card m-5 ">
+        <div class="card-header">
+            Login:
+        </div>
+        <div class="form-signin mt-4 p-5">
+
+            <form method="post"  >
+                <div class="form-group">
+                    {#                <label for="username">Usuáiro:</label> #}
+                    <input type="username" class="form-control" id="username" placeholder="Usuáiro" name="username">
+                </div>
+                <div class="form-group">
+                    {#                <label for="pwd">Senha:</label> #}
+                    <input type="password" class="form-control" id="pwd" placeholder="Senha" name="password">
+                </div>
+                <button type="submit" class="btn btn-primary mt-3 pt-2">Entrar</button>
+            </form>
+        </div>
     </div>
 </div>
 <style>
-    .container{
+    .container {
         display: flex;
         justify-content: center;
     }
-    .form-signin {
-        width: 100%;
-        max-width: 420px;
+
+    @media only screen and (max-device-width: 768px) {
+        * {
+            font-size: 1.875rem !important;
+        }
+        .card, .form-signin,container {
+            margin: 0!important;
+            width: 100%!important;
+
+        }
+        .container{
+            margin-left: 0!important;
+            margin-right: 0!important;
+            display: initial
+        }
     }
+
 </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>

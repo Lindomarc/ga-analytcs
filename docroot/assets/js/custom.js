@@ -1,12 +1,11 @@
 function showLoading() {
-    $("body nav, body div.container-fluid").addClass('page-loading');
-
+    $("body nav, body div.container-fluid").addClass('d-none');
+    $(".loading").show()
 }
-// showLoading()
+showLoading()
 function hideLoading() {
-    $("body nav, body div.container-fluid").removeClass('page-loading');
+    $("body nav, body div.container-fluid").removeClass('d-none');
     $(".loading").fadeOut()
-
 }
 
 
