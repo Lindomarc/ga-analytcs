@@ -255,13 +255,13 @@ class Websites implements ControllerProviderInterface
 
 
 
-    public function permissionDelete($id)
+    public function permissionDelete()
     {
         if (!isAuth()){
             return $this->app->redirect('/login');
         }
         $userWebsite = new UserWebsite();
-        $response['status'] = $userWebsite->delete($id);
+        $response['status'] = $userWebsite->delete($_POST['id']);
         return $this->app->json($response);
     }
 

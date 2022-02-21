@@ -3,6 +3,7 @@ function showLoading() {
     $(".loading").show()
 }
 showLoading()
+
 function hideLoading() {
     $("body nav, body div.container-fluid").removeClass('d-none');
     $(".loading").fadeOut()
